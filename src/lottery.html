@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>抽奖活动</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        padding: 8px;
+        margin-right: 5px;
+      }
+
+      button {
+        padding: 8px 15px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      li {
+        margin-bottom: 5px;
+      }
+
+      .highlight {
+        background-color: yellow;
+      }
+
+      .button {
+        font-size: 14px;
+        transition: font-size 0.3s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>抽奖活动</h1>
+      <input type="text" id="awardInput" />
+      <button class="button" onclick="addAward()">添加奖品</button>
+      <ul id="awardsList"></ul>
+      <button id="startButton" class="button" onclick="startHighlighting()">
+        开始
+      </button>
+      <button id="drawButton" class="button" onclick="drawWinner()">
+        抽奖
+      </button>
+      <div>
+        <button class="button" onclick="increaseFontSize()">增大字体</button>
+        <button class="button" onclick="decreaseFontSize()">缩小字体</button>
+      </div>
+    </div>
+    <footer>
+      <p>Created by M81</p>
+    </footer>
+    <script>
+      let awards = [];
+      let highlightInterval;
+      let currentHighlight = 0;
+      let running = false;
+
+      function addAward() {
+        if (running) {
+          alert("正在抽奖中，请停止抽奖后再添加奖项");
+          return;
+        }
+        const awardInput = document.getElementById("awardInput");
+        const newAward = awardInput.value;
+        awards.push(newAward);
+        displayAwards();
+        awardInput.value = "";
+      }
+
+      function displayAwards() {
+        const awardsList = document.getElementById("awardsList");
+        awardsList.innerHTML = "";
+        awards.forEach((award, index) => {
+          const li = document.createElement("li");
+          li.textContent = award;
+          const editButton = document.createElement("button");
+          editButton.textContent = "编辑";
+          editButton.onclick = () => editAward(index, award);
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "删除";
+          deleteButton.onclick = () => deleteAward(index);
+          li.appendChild(editButton);
+          li.appendChild(deleteButton);
+          awardsList.appendChild(li);
+        });
+      }
+
+      function editAward(index, oldAward) {
+        const newAward = prompt("编辑奖品：", oldAward);
+        if (newAward !== null) {
+          awards[index] = newAward;
+          displayAwards();
+        }
+      }
+
+      function deleteAward(index) {
+        awards.splice(index, 1);
+        displayAwards();
+      }
+
+      function startHighlighting() {
+        if (awards.length < 2) {
+          alert("请先添加至少两个奖项");
+          return;
+        }
+        if (running) {
+          alert("抽奖已经开始啦");
+          return;
+        }
+        highlightInterval = setInterval(() => {
+          const awardsListItems = document.querySelectorAll("#awardsList li");
+          awardsListItems[currentHighlight].classList.remove("highlight");
+          currentHighlight = (currentHighlight + 1) % awardsListItems.length;
+          awardsListItems[currentHighlight].classList.add("highlight");
+        }, 30);
+        running = true;
+      }
+
+      function drawWinner() {
+        if (running) {
+          running = false;
+          clearInterval(highlightInterval);
+          alert(`恭喜获得：${awards[currentHighlight]}`);
+        } else {
+          alert("请先开始抽奖");
+        }
+      }
+      function increaseFontSize() {
+        var container = document.querySelector(".container");
+        var currentFontSize = window.getComputedStyle(container).fontSize;
+        var newFontSize = parseInt(currentFontSize) + 2 + "px";
+        container.style.fontSize = newFontSize;
+        var buttons = document.querySelectorAll(".button");
+        buttons.forEach(function (button) {
+          var currentButtonFontSize = window.getComputedStyle(button).fontSize;
+          var newButtonFontSize = parseInt(currentButtonFontSize) + 2 + "px";
+          button.style.fontSize = newButtonFontSize;
+        });
+      }
+
+      function decreaseFontSize() {
+        var container = document.querySelector(".container");
+        var currentFontSize = window.getComputedStyle(container).fontSize;
+        var newFontSize = parseInt(currentFontSize) - 2 + "px";
+        container.style.fontSize = newFontSize;
+        var buttons = document.querySelectorAll(".button");
+        buttons.forEach(function (button) {
+          var currentButtonFontSize = window.getComputedStyle(button).fontSize;
+          var newButtonFontSize = parseInt(currentButtonFontSize) - 2 + "px";
+          button.style.fontSize = newButtonFontSize;
+        });
+      }
+    </script>
+  </body>
+</html>
